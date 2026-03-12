@@ -1,7 +1,5 @@
 package com.ipem.api.modules.usuario.service;
 
-import com.ipem.api.modules.usuario.dto.UsuarioRequestDTO;
-import com.ipem.api.modules.usuario.dto.UsuarioResponseDTO;
 import com.ipem.api.modules.usuario.model.Usuario;
 import com.ipem.api.modules.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
