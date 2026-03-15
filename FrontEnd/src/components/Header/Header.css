@@ -1,0 +1,40 @@
+:root {
+  --primary: #1a1e50;
+  --secondary: #01aded;
+  --white: #ffffff;
+  --text-dark: #2d3436;
+}
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--primary);
+  height: 65px;
+  display: flex;
+  align-items: center;
+  border-bottom: 3px solid var(--secondary);
+}
+
+.container-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.logo-brand {
+  height: 45px;
+  width: auto;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 8px 0;
+}
