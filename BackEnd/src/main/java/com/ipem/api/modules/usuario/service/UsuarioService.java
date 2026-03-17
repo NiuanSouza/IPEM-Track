@@ -1,14 +1,14 @@
 package com.ipem.api.modules.usuario.service;
 
 import com.ipem.api.modules.usuario.model.Usuario;
-import com.ipem.api.modules.usuario.model.enums.Permissao;
 import com.ipem.api.modules.usuario.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,22 +18,36 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Map<String, Object> cadastrar(Map<String, Object> dados) {
-        Usuario novoUsuario = Usuario.builder()
-                .id((Integer) dados.get("id"))
-                .nome((String) dados.get("nome"))
-                .email((String) dados.get("email"))
-                .permissao(Permissao.valueOf((String) dados.get("permissao")))
-                .senha(passwordEncoder.encode((String) dados.get("senha")))
-                .build();
+    public Usuario cadastrar(Usuario usuario) {
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        return repository.save(usuario);
+    }
 
-        repository.save(novoUsuario);
+    @Transactional(readOnly = true)
+    public List<Usuario> listarTodos() {
+        return repository.findAll();
+    }
 
-        return Map.of(
-                "id", novoUsuario.getId(),
-                "nome", novoUsuario.getNome(),
-                "email", novoUsuario.getEmail(),
-                "permissao", novoUsuario.getPermissao()
-        );
+    @Transactional(readOnly = true)
+    public Optional<Usuario> buscarPorId(Integer id) {
+        return repository.findById(id);
+    }
+
+    @Transactional
+    public Usuario atualizar(Integer id, Usuario usuarioAtualizado) {
+        return repository.findById(id)
+                .map(usuario -> {
+                    usuario.setNome(usuarioAtualizado.getNome());
+                    usuario.setEmail(usuarioAtualizado.getEmail());
+                    usuario.setPermissao(usuarioAtualizado.getPermissao());
+                    usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
+                    return repository.save(usuario);
+                })
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    @Transactional
+    public void deletar(Integer id) {
+        repository.deleteById(id);
     }
 }

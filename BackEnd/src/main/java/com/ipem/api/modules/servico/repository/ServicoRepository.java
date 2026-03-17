@@ -1,4 +1,7 @@
 package com.ipem.api.modules.servico.repository;
 
-public interface ServicoRepository {
+import com.ipem.api.modules.servico.model.Servico;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ServicoRepository extends JpaRepository<Servico, Long> {
 }
