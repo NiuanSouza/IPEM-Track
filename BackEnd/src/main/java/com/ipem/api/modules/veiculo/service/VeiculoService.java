@@ -18,10 +18,6 @@ public class VeiculoService {
         return carroRepository.findAll();
     }
 
-    public Optional<Carro> buscarPorPrefixo(String prefixo) {
-        return carroRepository.findById(prefixo);
-    }
-
     public Carro salvar(Carro carro) {
         return carroRepository.save(carro);
     }

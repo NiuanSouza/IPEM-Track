@@ -48,7 +48,7 @@ const Login = () => {
           name="email"
           type="email"
           className="auth-input"
-          placeholder="E-mail funcional:"
+          placeholder="E-mail:"
           required
           value={values.email}
           onChange={handleChange}
