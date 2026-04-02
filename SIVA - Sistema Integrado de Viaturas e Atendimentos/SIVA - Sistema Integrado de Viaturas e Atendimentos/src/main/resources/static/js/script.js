@@ -25,20 +25,25 @@ async function btnindex() {
             const data = await response.json();
 
             // Salva os dados do usuário no navegador para usar depois
+            localStorage.setItem("token", data.token);
             localStorage.setItem("usuarioNome", data.nome);
-            localStorage.setItem("usuarioPermissao", data.permissao);
+            localStorage.setItem("usuarioPermissao", data.permissao.toUpperCase());
 
             // Redireciona para a tela certa dependendo se é Gestor (Administrador) ou Técnico
-            if (data.permissao === "ADMINISTRADOR") {
+            if (data.permissao.toUpperCase() === "ADMINISTRADOR") {
                 window.location.href = "telainicial-gestor.html";
             } else {
                 window.location.href = "telainicial.html";
             }
 
         } else {
-            // Se a senha estiver errada, mostra a mensagem de erro que vem do Java
-            const errorData = await response.json();
-            alert(errorData.erro || "E-mail ou senha incorretos.");
+            // Se a senha estiver errada, tenta ler o JSON de erro; se falhar (403 puro), mostra mensagem padrão
+            try {
+                const errorData = await response.json();
+                alert(errorData.erro || "E-mail ou senha incorretos.");
+            } catch (e) {
+                alert("Acesso negado ou erro no servidor (403).");
+            }
         }
     } catch (error) {
         //Mostra o erro no console
@@ -71,14 +76,14 @@ async function efetuarLogin() {
             body: JSON.stringify(dadosLogin)
         });
 
-        const data = await response.json();
-
-        if (response.ok && data.mensagem === "Sucesso") {
+        if (response.ok) {
+            const data = await response.json();
             // Limpa dados de veículos antigos ao entrar
             localStorage.removeItem('veiculoSelecionado');
             localStorage.removeItem('quilometragemAtual');
             localStorage.removeItem('observacoes');
 
+            localStorage.setItem('token', data.token);
             localStorage.setItem('usuarioNome', data.nome);
             alert("Sucesso"); // Mensagem que você pediu
             window.location.href = "telainicial.html";
@@ -167,6 +172,7 @@ async function salvarVeiculoInfo() {
     const kmInput = document.getElementById('quilometragem-atual');
     const obsInput = document.getElementById('observacoes');
     const veiculo = JSON.parse(localStorage.getItem('veiculoSelecionado'));
+    const token = localStorage.getItem('token');
 
     if (!veiculo || !veiculo.prefixo) {
         alert("Erro: Selecione um veículo primeiro na tela de chamados.");
@@ -184,7 +190,10 @@ async function salvarVeiculoInfo() {
     try {
         const response = await fetch(`http://localhost:8080/veiculo/${veiculo.prefixo}/atualizar-dados`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(dadosParaEnviar)
         });
 
@@ -265,6 +274,7 @@ async function cadastrarVeiculo() {
     const placa = document.getElementById("placaVeiculo").value.trim();
     const prefixo = document.getElementById("prefixoVeiculo").value.trim();
     const combustivel = document.getElementById("combustivelVeiculo").value.trim();
+    const token = localStorage.getItem('token');
 
     // Validação básica
     if (!placa || !prefixo) {
@@ -283,7 +293,10 @@ async function cadastrarVeiculo() {
     try {
         const response = await fetch("http://localhost:8080/veiculo/cadastrar", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify(dadosCarro)
         });
 
